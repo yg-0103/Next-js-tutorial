@@ -12,7 +12,7 @@ function ItemList({ list }) {
               key={item.id}
               style={{ textAlign: 'center', margin: '20px 0' }}
             >
-              <Link href={`/view/${item.id}`}>
+              <Link href={`/detail/${item.id}`}>
                 <a>
                   <img
                     style={{

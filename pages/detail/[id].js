@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import { Button, Divider, Item } from 'semantic-ui-react';
+import { Button, Divider, Item, Loader } from 'semantic-ui-react';
 
-function View({ item, name }) {
-  // const router = useRouter();
+function Detail({ item, name }) {
+  const router = useRouter();
   // const [item, setItem] = useState(null);
   // const { id } = router.query;
 
@@ -23,8 +23,16 @@ function View({ item, name }) {
   //   if (!id) return;
   //   getData();
   // }, [id]);
-
-  // if (!item) return null;
+  if (router.isFallback) {
+    return (
+      <div style={{ padding: '300px 0' }}>
+        <Loader inline="centered" active>
+          Loading
+        </Loader>
+      </div>
+    );
+  }
+  if (!item) return null;
   return (
     <div style={{ padding: '15px 10px' }}>
       {name} 환경입니다
@@ -53,9 +61,21 @@ function View({ item, name }) {
   );
 }
 
-export default View;
+export default Detail;
 
-export async function getServerSideProps(context) {
+export async function getStaticPaths() {
+  const apiUrl = process.env.apiUrl;
+  const res = await axios.get(apiUrl);
+  const data = res.data;
+  return {
+    paths: data.slice(0, 9).map(item => ({
+      params: { id: `${item.id}` },
+    })),
+    fallback: true,
+  };
+}
+
+export async function getStaticProps(context) {
   const id = context.params.id;
   const apiUrl = `http://makeup-api.herokuapp.com/api/v1/products/${id}.json`;
   const res = await axios.get(apiUrl);
